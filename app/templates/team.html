@@ -1,0 +1,93 @@
+{% extends "includes/layout.html" %}
+
+{% block main %}
+<h1 class="text-center mb-5">Takımım</h1>
+<table class="table table-striped table-hover align-middle">
+    <thead>
+        <tr>
+            <th class="text-center">Personel ID</th>
+            <th class="text-center">İsim</th>
+            <th class="text-center">Yaş</th>
+            <th class="text-center">E-Posta Adresi</th>
+        </tr>
+    </thead>
+    <tbody class="table-group-divider">
+        {% comment %} API ile otomatik doldurulacak {% endcomment %}
+        {% for i in '0123456789'|make_list %}
+        <tr>
+            <td class="col-3">
+                <div class="placeholder-glow">
+                    <span class="placeholder placeholder-lg col-12"></span>
+                </div>
+            </td>
+            <td class="col-3">
+                <div class="placeholder-glow">
+                    <span class="placeholder placeholder-lg col-12"></span>
+                </div>
+            </td>
+            <td class="col-3">
+                <div class="placeholder-glow">
+                    <span class="placeholder placeholder-lg col-12"></span>
+                </div>
+            </td>
+            <td class="col-3">
+                <div class="placeholder-glow">
+                    <span class="placeholder placeholder-lg col-12"></span>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock main %}
+
+{% block scripts %}
+<script>
+function fetchEmployeesByTeam() {
+    fetch(`/api/v1/employee/by-team/`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+    })
+    .then(response => {
+        if (!response.ok) {
+            Swal.fire({
+                icon: 'error',
+                title: 'HTTP Error! Status:' + response.status,
+                confirmButtonText: 'Tamam',
+            });
+            return;
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Tabloyu dinamik olarak API yardımı ile oluşturuyoruz.
+        const tbody = document.querySelector('table.table tbody');
+        tbody.innerHTML = ''; // Var olan içeriği temizliyoruz.
+        data.forEach(employee => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="text-center">${employee.id}</td>
+                <td class="text-center">${employee.full_name}</td>
+                <td class="text-center">${employee.age}</td>
+                <td class="text-center">${employee.email}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    })
+    .catch(error => {
+        Swal.fire({
+            icon: 'error',
+            title: 'Bir hata oluştu! ' + error,
+            confirmButtonText: 'Tamam',
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    fetchEmployeesByTeam();
+});
+</script>
+{% endblock scripts %}

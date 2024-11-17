@@ -1,0 +1,271 @@
+{% extends "includes/layout.html" %}
+
+{% block main %}
+{% if request.user.team_type != "Montaj" %}
+<table class="table table-striped table-hover align-middle">
+    <thead>
+        <tr>
+            <th class="text-center">ID</th>
+            <th class="text-center">Parça Tipi</th>
+            <th class="text-center">Uçak Tipi</th>
+            <th class="text-center">Üreten Personel</th>
+            <th class="text-center">Monte Edildi Mi?</th>
+            <th class="text-center">Monte Edilen Uçak ID</th>
+            <th class="text-center">Üretim Tarihi</th>
+            <th class="text-center">Geri Dönüştür</th>
+            <th class="text-end">
+                <div class="input-group justify-content-end">
+                    <select id="plane_type" name="plane_type" class="form-select-sm text-center">
+                        <option value="" selected>Uçak Türü Seçin...</option>
+                        <option value="TB2">TB2</option>
+                        <option value="TB3">TB3</option>
+                        <option value="AKI">AKINCI</option>
+                        <option value="KIZ">KIZILELMA</option>
+                    </select>
+                    <button id="create_button" class="btn btn-sm btn-primary" onclick="createPart()" disabled>Yeni Parça Üret</button>
+                </div>
+            </th>
+        </tr>
+    </thead>
+    <tbody class="table-group-divider">
+        {% comment %} API ile otomatik doldurulacak {% endcomment %}
+        {% for i in '0123456789'|make_list %}
+        <tr>
+            <td class="col-1">
+                <div class="placeholder-glow">
+                    <span class="placeholder placeholder-lg col-12"></span>
+                </div>
+            </td>
+            <td class="col-1">
+                <div class="placeholder-glow">
+                    <span class="placeholder placeholder-lg col-12"></span>
+                </div>
+            </td>
+            <td class="col-1">
+                <div class="placeholder-glow">
+                    <span class="placeholder placeholder-lg col-12"></span>
+                </div>
+            </td>
+            <td class="col-1">
+                <div class="placeholder-glow">
+                    <span class="placeholder placeholder-lg col-12"></span>
+                </div>
+            </td>
+            <td class="col-1">
+                <div class="placeholder-glow">
+                    <span class="placeholder placeholder-lg col-12"></span>
+                </div>
+            </td>
+            <td class="col-2">
+                <div class="placeholder-glow">
+                    <span class="placeholder placeholder-lg col-12"></span>
+                </div>
+            </td>
+            <td class="col-1">
+                <div class="placeholder-glow">
+                    <span class="placeholder placeholder-lg col-12"></span>
+                </div>
+            </td>
+            <td class="col-1">
+                <div class="placeholder-glow">
+                    <span class="placeholder placeholder-lg col-12"></span>
+                </div>
+            </td>
+            <td class="col-3">
+                <div class="placeholder-glow">
+                    <span class="placeholder placeholder-lg col-12"></span>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<br><br>
+{% else %}
+<h1>Oops, buraya nasıl geldin? Bir hata yapmış olmalıyım...</h1>
+{% endif %}
+{% endblock main %}
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+<script>
+$("#plane_type").on('change',function(){
+       if($(this).find('option:selected').text()=="Uçak Türü Seçin...")
+           $("#create_button").attr('disabled',true)
+       else
+           $("#create_button").attr('disabled',false)
+}).trigger("change");
+</script>
+
+<script>
+    function reload() {
+        fetchParts();
+    }
+</script>
+
+<script>
+function createPart() {
+    const plane_type = document.getElementById('plane_type').value;
+
+    if (!plane_type) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Parça üretilecek uçağın türünü seçmelisiniz!',
+            confirmButtonText: 'Tamam',
+        });
+        return;
+    }
+
+    fetch(`/api/v1/part/create/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFTOKEN' : '{{csrf_token}}'
+        },
+        credentials: 'include',
+        body: JSON.stringify({plane_type: plane_type})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Parça başarıyla oluşturuldu!',
+                confirmButtonText: 'Tamam',
+            });
+            reload();
+        }
+        else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Parça oluşturulurken bir hata oluştu! ' + data.error,
+                confirmButtonText: 'Tamam',
+            });
+        }
+    })
+    .catch(error => {
+        Swal.fire({
+            icon: 'error',
+            title: 'Bir hata oluştu! ' + error,
+            confirmButtonText: 'Tamam',
+        });
+    });
+}
+</script>
+
+<script>
+// Parça listesini çekiyoruz
+function fetchParts() {
+    fetch(`/api/v1/part/list/`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+    })
+    .then(response => {
+        if (!response.ok) {
+            Swal.fire({
+                icon: 'error',
+                title: 'HTTP Error! Status:' + response.status,
+                confirmButtonText: 'Tamam',
+            });
+            return;
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Tabloyu dinamik olarak API yardımı ile oluşturuyoruz.
+        const tbody = document.querySelector('table.table tbody');
+        tbody.innerHTML = ''; // Var olan içeriği siliyoruz.
+        data.forEach(part => {
+            const createdAt = new Date(part.created_at); // İstediğimiz gibi formatlamak için Date objesi oluşturuyoruz
+
+            // Tarihi formatlıyoruz
+            const formattedDate = createdAt.toLocaleString('tr-TR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="text-center">${part.id}</td>
+                <td class="text-center">${part.part_type}</td>
+                <td class="text-center">${part.full_plane_type}</td>
+                <td class="text-center">${part.employee.full_name}</td>
+                <td class="text-center">${part.mounted ? '<span class="text-success">&#10004;</span>' : '<span class="text-success">&#10060;</span>'}</td>
+                <td class="text-center">${part.plane ? part.plane.id : "-"}</td>
+                <td class="text-center">${formattedDate}</td>
+                ${part.mounted ? '<td class="text-center"></td>' : '<td class="text-center"><button class="btn btn-sm btn-danger" onclick="deletePart(' + part.id + ')">Geri Dönüştür</button></td>'}
+                <td></td>
+            `;
+            tbody.appendChild(row);
+        });
+    })
+    .catch(error => {
+        Swal.fire({
+            icon: 'error',
+            title: 'Bir hata oluştu! ' + error,
+            confirmButtonText: 'Tamam',
+        });
+    });
+}
+
+function deletePart(part_id) {
+    Swal.fire({
+        title: 'Silmek istediğinden emin misin?',
+        text: 'Bu işlem geri alınamaz',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Evet, sil!',
+        cancelButtonText: 'Hayır'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/api/v1/part/delete/`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFTOKEN' : '{{csrf_token}}'
+                },
+                credentials: 'include',
+                body: JSON.stringify({part_id: part_id})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Parça başarıyla silindi!',
+                        confirmButtonText: 'Tamam',
+                    });
+                    fetchParts();
+                }
+                else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Parça silinemedi! ' + data.error,
+                        confirmButtonText: 'Tamam',
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Bir hata oluştu! ' + error,
+                    confirmButtonText: 'Tamam',
+                });
+            })
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    fetchParts();
+});
+</script>
+{% endblock scripts %}

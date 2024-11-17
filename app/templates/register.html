@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baykar | Kayıt</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="d-flex align-items-center min-vh-100">
+
+        <div class="card text-bg-light w-25 mx-auto">
+            <div class="card-header py-4">
+                <h2 class="text-center">Personel Kayıt</h2>
+            </div>
+            <div class="card-body px-5 py-4">
+                <form id="register-form" action="{% url 'register' %}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-4 mt-3">
+                        <input type="text" class="form-control" id="email" name="email" placeholder="E-Posta" required>
+                    </div>
+                    <div class="mb-4">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Şifre" required>
+                    </div>
+                    <div class="mb-4">
+                        <input type="text" class="form-control" id="full_name" name="full_name" placeholder="Ad Soyad" required>
+                    </div>
+                    <div class="mb-4">
+                        <input type="number" class="form-control" id="age" name="age" min="0" max="100" placeholder="Yaş">
+                    </div>
+                    <div class="mb-4">
+                        <select class="form-select" id="team_type" name="team_type">
+                            <option value="" selected>Bir Takım Seçin...</option>
+                            <option value="Kanat">Kanat Takımı</option>
+                            <option value="Gövde">Gövde Takımı</option>
+                            <option value="Kuyruk">Kuyruk Takımı</option>
+                            <option value="Aviyonik">Aviyonik Takımı</option>
+                            <option value="Montaj">Montaj Takımı</option>
+                        </select>
+                    </div>
+                    <button type="button" onclick="submitForm()" class="btn btn-primary w-100 mb-3">Kayıt Ol</button>
+                    <div class="text-center">
+                        <a href="{% url 'login' %}" style="font-size: 1rem;">Zaten bir hesabın var mı? Giriş yap</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {% if messages %}
+        {% for message in messages %}
+            <script>
+                Swal.fire({
+                    icon: '{{message.tags}}',
+                    title: '{{message}}',
+                    confirmButtonText: 'Tamam',
+                });
+            </script>
+        {% endfor %}
+    {% endif %}
+
+    <script>
+    function submitForm() {
+        var email = document.getElementById('email').value;
+        var password = document.getElementById('password').value;
+        var full_name = document.getElementById('full_name').value;
+        var age = document.getElementById('age').value;
+        var team_type = document.getElementById('team_type').value;
+
+        if (!email)
+        {
+            Swal.fire({
+                icon: 'error',
+                title: 'E-posta alanı boş bırakılamaz!',
+                confirmButtonText: 'Tamam',
+            });
+            return;
+        }
+
+        if (!password)
+        {
+            Swal.fire({
+                icon: 'error',
+                title: 'Şifre alanı boş bırakılamaz!',
+                confirmButtonText: 'Tamam',
+            });
+            return;
+        }
+
+        if (!full_name)
+        {
+            Swal.fire({
+                icon: 'error',
+                title: 'Ad Soyad alanı boş bırakılamaz!',
+                confirmButtonText: 'Tamam',
+            });
+            return;
+        }
+
+        if (!age)
+        {
+            Swal.fire({
+                icon: 'error',
+                title: 'Yaş alanı boş bırakılamaz!',
+                confirmButtonText: 'Tamam',
+            });
+            return;
+        }
+
+        if (age < 18)
+        {
+            Swal.fire({
+                icon: 'error',
+                title: '18 yaşından küçükler kayıt olamaz!',
+                confirmButtonText: 'Tamam',
+            });
+            return;
+        }
+
+        if (age > 100)
+        {
+            Swal.fire({
+                icon: 'error',
+                title: 'Bu kadar yaşlı olduğunu sanmıyorum!',
+                confirmButtonText: 'Ne?!',
+            });
+            return;
+        }
+
+        if (!team_type)
+        {
+            Swal.fire({
+                icon: 'error',
+                title: 'Takım alanı boş bırakılamaz!',
+                confirmButtonText: 'Tamam',
+            });
+            return;
+        }
+
+        document.getElementById('register-form').submit();
+    }
+    </script>
+</body>
+</html>
