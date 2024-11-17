@@ -1,6 +1,8 @@
 <h1>Django ile İHA Kiralama Projesi | Hava Aracı Üretim Uygulaması</h1>
 
 Django ile yazılmış basit bir hava aracı üretim uygulaması.
+<br>
+Python Versiyonu: 3.10.7
 
 # İndirme
 - <h3>1. Projeyi indirin.</h3>
@@ -9,19 +11,34 @@ Django ile yazılmış basit bir hava aracı üretim uygulaması.
 git clone https://github.com/mozancetin/BaykarProject.git
 ```
 
-- <h3>2. Gereksinimleri indirin.</h3>
-
 ```cmd
-pip install -r requirements.txt
+cd BaykarProject
 ```
 
-- <h3>3. Docker'ı başlatın.</h3>
+- <h3>2. Virtualenv oluşturun ve aktifleştirin. (Zorunlu değil ama kesinlikle önerilir)</h3>
+
+```cmd
+python -m venv venv
+```
+
+```cmd
+. ./venv/Scripts/activate (For Windows)
+source ./venv/bin/activate (For Linux)
+```
+
+- <h3>3. Gereksinimleri indirin.</h3>
+
+```cmd
+python -m pip install -r requirements.txt
+```
+
+- <h3>4. Docker'ı başlatın.</h3>
 
 ```cmd
 docker-compose up --build
 ```
 
-- <h3>4. Veritabanını kurun.</h3>
+- <h3>5. Yeni bir terminal açıp veritabanını kurun.</h3>
 
 ```cmd
 docker-compose exec web python manage.py migrate
@@ -158,3 +175,11 @@ API kullanımı için hesap oluşturulup giriş yapılması gerekmektedir.
 - <h3>API Dökümantasyonu 2</h3>
 
 ```/api/v1/redoc/ (GET)```
+
+# Testleri Çalıştırma
+
+Docker çalışıyorken bu komut ile testleri çalıştırabilirsiniz:
+
+```cmd
+docker-compose exec web python manage.py test
+```
