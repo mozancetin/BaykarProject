@@ -9,6 +9,10 @@ Django ile yazılmış basit bir hava aracı üretim uygulaması.
 git clone https://github.com/mozancetin/BaykarProject.git
 ```
 
+```cmd
+cd BaykarProject
+```
+
 - <h3>2. Gereksinimleri indirin.</h3>
 
 ```cmd
