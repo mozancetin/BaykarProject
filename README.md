@@ -38,7 +38,7 @@ python -m pip install -r requirements.txt
 docker-compose up --build
 ```
 
-- <h3>5. Veritabanını kurun.</h3>
+- <h3>5. Yeni bir terminal açıp veritabanını kurun.</h3>
 
 ```cmd
 docker-compose exec web python manage.py migrate
