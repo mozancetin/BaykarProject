@@ -180,7 +180,7 @@ function fetchPlanes() {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td class="text-center">${plane.id}</td>
-                <td class="text-center">${plane.plane_type}</td>
+                <td class="text-center">${plane.full_plane_type}</td>
                 <td class="text-center">${plane.employee.full_name}</td>
                 <td class="text-center">${formattedDate}</td>
             `;
