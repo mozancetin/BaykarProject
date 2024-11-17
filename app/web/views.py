@@ -79,7 +79,7 @@ def custom_login(request):
             login(request, user)
             return JsonResponse({"success": "Başarıyla giriş yapıldı!"}, status=200)
         else:
-            return JsonResponse({"error": "Giriş bilgileri geçersiz " + str(email) + " " + str(password)}, status=400)
+            return JsonResponse({"error": "Giriş bilgileri geçersiz"}, status=400)
     return render(request, "login.html")
 
 @login_required(login_url='/')
