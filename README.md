@@ -175,3 +175,11 @@ API kullanımı için hesap oluşturulup giriş yapılması gerekmektedir.
 - <h3>API Dökümantasyonu 2</h3>
 
 ```/api/v1/redoc/ (GET)```
+
+# Testleri Çalıştırma
+
+Docker çalışıyorken bu komut ile testleri çalıştırabilirsiniz:
+
+```cmd
+docker-compose exec web python manage.py test
+```
